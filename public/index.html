@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Scan me</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<link rel="stylesheet" href="./styles/index.css" />
+        
+	</head>
+	<body>
+		<div class="container">
+			<div id="qr"></div>
+			<video src="./res/vid/itik.mp4" id="vid" muted controls></video>
+		</div>
+
+		<script src="./libs/qr/qrcode.min.js"></script>
+		<script>
+			const qr = new QRCode('qr');
+			qr.makeCode('http://28363dee4597.ap.ngrok.io/scan');
+
+            $(document).ready(function(){
+              $("#hide").click(function(){
+                $("#qr").hide();
+                $("video").show(300);
+
+				$('#vid').trigger('play');
+              });
+            });
+        </script>
+		
+		<!-- MQTT (two way comm) -->
+		<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+		<script
+			src="https://code.jquery.com/jquery-3.6.0.min.js"
+			integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+			crossorigin="anonymous"
+		></script>
+		<script>
+			window.onload = () => {
+				$("#vid").hide();
+			};
+
+			const client = mqtt.connect('ws://broker.emqx.io:8083/mqtt');
+
+			client.on("connect", () => {
+				client.subscribe("syed/assignment/qr/status");
+
+				console.log("MQTT connected");
+			});
+
+			client.on("message", (topic, message) => {
+				$("#qr").hide();
+                $("video").show(300);
+
+				$('#vid').trigger('play');
+			});
+		</script>
+	</body>
+</html>
